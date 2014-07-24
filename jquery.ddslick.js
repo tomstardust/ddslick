@@ -24,14 +24,14 @@
         keepJSONItemsOnTop: false,
         width: 260,
         height: null,
-        background: "#eee",
+        background: "#fff",
         selectText: "",
         defaultSelectedIndex: null,
         truncateDescription: true,
         imagePosition: "left",
         showSelectedHTML: true,
         clickOffToClose: true,
-		embedCSS: true,
+				embedCSS: true,
         onSelected: function () { }
     },
 
@@ -43,15 +43,16 @@
                 '.dd-select{ border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}' +
                 '.dd-desc { color:#aaa; display:block; overflow: hidden; font-weight:normal; line-height: 1.4em; }' +
                 '.dd-selected{ overflow:hidden; display:block; padding:10px; font-weight:bold;}' +
+								'.dd-hide{ opacity:.3; cursor:default; }' +
                 '.dd-pointer{ width:0; height:0; position:absolute; right:10px; top:50%; margin-top:-3px;}' +
                 '.dd-pointer-down{ border:solid 5px transparent; border-top:solid 5px #000; }' +
                 '.dd-pointer-up{border:solid 5px transparent !important; border-bottom:solid 5px #000 !important; margin-top:-8px;}' +
-                '.dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 5px #ddd; display:none; position:absolute; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto;}' +
-                '.dd-option{ padding:10px; display:block; border-bottom:solid 1px #ddd; overflow:hidden; text-decoration:none; color:#333; cursor:pointer;-webkit-transition: all 0.25s ease-in-out; -moz-transition: all 0.25s ease-in-out;-o-transition: all 0.25s ease-in-out;-ms-transition: all 0.25s ease-in-out; }' +
+                '.dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 3px rgba(0,0,0,0.2); display:none; position:absolute; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto;}' +
+                '.dd-option{ padding:10px; display:block; border-bottom:solid 1px #ddd; overflow:hidden; text-decoration:none; color:#333; cursor:pointer;-webkit-transition: all 0.25s ease-in-out; -moz-transition: all 0.25s ease-in-out;-o-transition: all 0.25s ease-in-out;-ms-transition: all 0.25s ease-in-out; transition: all 0.25s ease-in-out;}' +
                 '.dd-options > li:last-child > .dd-option{ border-bottom:none;}' +
-                '.dd-option:hover{ background:#f3f3f3; color:#000;}' +
+                '.dd-option:hover{ background:#f3f3f3; box-shadow: 0 1px 0 #fff inset; color:#000;}' +
                 '.dd-selected-description-truncated { text-overflow: ellipsis; white-space:nowrap; }' +
-                '.dd-option-selected { background:#f6f6f6; }' +
+                '.dd-option-selected { background:#eaeaea; box-shadow: 0 1px 0 #fff inset; }' +
                 '.dd-option-image, .dd-selected-image { vertical-align:middle; float:left; margin-right:5px; max-width:64px;}' +
                 '.dd-image-right { float:right; margin-right:15px; margin-left:5px;}' +
                 '.dd-container{ position:relative;}​ .dd-selected-text { font-weight:bold}​</style>';
@@ -87,6 +88,7 @@
                         text: $.trim($this.text()),
                         value: $this.val(),
                         selected: $this.is(':selected'),
+												disabled: $this.is(':disabled'),
                         description: thisData.description,
                         imageSrc: thisData.imagesrc //keep it lowercase for HTML5 data-attributes
                     });
@@ -127,7 +129,7 @@
                 $.each(options.data, function (index, item) {
                     if (item.selected) options.defaultSelectedIndex = index;
                     ddOptions.append('<li>' +
-                        '<a class="dd-option">' +
+                        '<a class="dd-option' + (item.disabled ? ' disabled' : '') + '">' +
                             (item.value ? ' <input class="dd-option-value" type="hidden" value="' + item.value + '" />' : '') +
                             (item.imageSrc ? ' <img class="dd-option-image' + (options.imagePosition == "right" ? ' dd-image-right' : '') + '" src="' + item.imageSrc + '" />' : '') +
                             (item.text ? ' <label class="dd-option-text">' + item.text + '</label>' : '') +
@@ -167,6 +169,8 @@
                 obj.find('.dd-option').on('click.ddslick', function () {
                     selectIndex(obj, $(this).closest('li').index());
                 });
+								//Disable selection on disabled options
+                obj.find('.dd-option.disabled').unbind('click');
 
                 //Click anywhere to close
                 if (options.clickOffToClose) {
